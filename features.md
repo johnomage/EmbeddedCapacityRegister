@@ -83,10 +83,10 @@
 | **Heading**                             | **Explanation** |
 |-----------------------------------------|-----------------|
 | **General Data**                        |                 |
-| **Export MPAN / MSID**                  | The core meter point administration number, a 13-digit reference used in MPAS to identify the relevant Metering Point. For generation and storage sites, the "Export" MPAN (or MSID for CVA registered sites) should be included. For "Accepted to Connect" generation or storage entries, please indicate "data not available". |
-| **Import MPAN / MSID**                  | The core meter point administration number, a 13-digit reference used in MPAS to identify the relevant Metering Point. For sites subject to a DSR contract and for storage sites, the "Import" MPAN (or MSID for CVA registered sites) should be included. For generation sites, including generators taking on-site supplies, please indicate "not applicable". For "Accepted to Connect" storage sites, please indicate "data not available". |
-| **Customer Name**                      | Name of party that is connected or contracted to connect. |
-| **Customer Site**                      | Name of Customer Site/project name. |
+| **Export MPAN / MSID**                  | The meter point administration number, a 13-digit reference to identify Metering Point for Export. |
+| **Import MPAN / MSID**                  | same as above, for Import |
+| **Customer Name**                      | Name of customer that is connected or contracted to connect. |
+| **Customer Site**                      | Customer Site/project name. |
 | **Address Line 1**                     | Address line 1 of the Customer Site. |
 | **Address Line 2**                     | Address line 2 of the Customer Site. |
 | **Town/ City**                         | Town / City of the Customer Site. |
@@ -95,14 +95,14 @@
 | **Country**                            | GB country of the Customer Site. |
 | **Location (X-coordinate): Eastings (where data is held)** | Six-digit British National Grid X coordinate of the Customer Site. Generally this is the same as the Point of Connection / Metering Point. In exceptional cases where the Point of Connection or Metering Point is not located at the Customer Site, the coordinates of the Customer Site are included. |
 | **Location (Y-coordinate): Northings (where data is held)** | Six or seven-digit British National Grid Y coordinate of the Customer Site. (In Northern Scotland, these will be seven-digit coordinates.) Generally this is the same as the Point of Connection / Metering Point. In exceptional cases where the Point of Connection or Metering Point is not located at the Customer Site, the coordinates of the Customer Site are included. |
-| **Grid Supply Point**                  | The point of connection between the transmission system and the distribution system that is linked with the Customer Site. |
-| **Bulk Supply Point**                  | The supply point on the distribution system (representing an EHV/EHV transformation level) that is linked with the Customer Site. |
+| **Grid Supply Point**                  | The transformer between the transmission and the distribution systems (400 or 275KV/132KV) that is linked with the Customer Site. |
+| **Bulk Supply Point**                  | The tranfomer between the distribution system and primary substations (132/33KV) (representing an EHV/EHV transformation level) that is linked with the Customer Site. |
 | **Primary**                            | The primary substation on the distribution system that is linked with the Customer Site. |
 | **Point of Connection (POC) Voltage (kV)** | The voltage at the Point of Connection to the distribution system. |
-| **Licence Area**                       | Licence area Customer Site is connected within. |
-| **Energy Source 1**                    | Meaning any of the below energy source types used in the production of electricity: Advanced Fuel (produced via gasification or pyrolysis of biofuel or waste), Biofuel - Biogas from anaerobic digestion (excluding landfill & sewage), Biofuel - Landfill gas, Biofuel - Sewage gas, Biofuel - Other, Biomass, Fossil - Brown coal/lignite, Fossil - Coal gas, Fossil - Gas, Fossil - Hard coal, Fossil - Oil, Fossil - Oil shale, Fossil - Peat, Fossil - Other, Geothermal, Hydrogen, Nuclear, Solar, Stored Energy (all stored energy irrespective of the original energy source), Waste, Water (flowing water or head of water), Wind, Other, Data not available. |
+| **Licence Area**                       | Licence area (DNO) Customer Site is connected within. |
+| **Energy Source 1**                    | Meaning any of the below energy source types used in the production of electricity: Advanced Fuel (produced via gasification or pyrolysis of biofuel or waste), Biofuel - Biogas from anaerobic digestion (excluding landfill & sewage), Biofuel - Landfill gas, Biofuel - Sewage gas, Biofuel - Other, Biomass, Fossil - Brown coal/lignite, Fossil - Coal gas, Fossil - Gas, Fossil - Hard coal, Fossil - Oil, Fossil - Oil shale, Fossil - Peat, Fossil - Other, Geothermal, Hydrogen, Nuclear, Solar, Stored Energy (all stored energy irrespective of the original energy source), Waste, Water (flowing water or head of water), Wind, Other. |
 | **Energy Conversion Technology 1**     | Meaning any of the below technology types that export electricity onto a distribution system: Engine (combustion / reciprocating), Steam turbine (thermal power plant), Gas turbine (OCGT), Steam-gas turbine (CCGT), Fuel Cell, Hydro - Run of river, Hydro - Reservoir (not pumped), Hydro - Other, Tidal lagoons, Tidal stream devices, Wave devices, Photovoltaic, Offshore wind turbines, Onshore wind turbines, Geothermal power plant, Storage - Chemical, Storage - Electrical, Storage - Mechanical - Compressed Air (Adiabatic & Diabatic), Storage - Mechanical - Liquid Air, Storage - Mechanical - Pumped Hydro, Storage - Mechanical - Flywheel, Storage - Thermal, Storage - Electrochemical (Batteries), Storage - Other, Interconnector, Other, Data not available. |
-| **CHP Cogeneration (Yes/No)**           | Indicates whether the generation in the Customer Site forms part of a CHP scheme. |
+| **CHP Cogeneration (Yes/No)**           | Indicates whether the generation in the Customer Site forms part of a CHP (Combined Heat and Power) scheme. |
 | **Storage Capacity 1 (MWh)**            | This is the energy capacity of the storage facility (MWh). |
 | **Storage Duration 1 (Hours)**          | Divide the storage capacity (MWh) by the Registered Capacity (MW) and round it down to the nearest 0.5 (half-hour). If the value is less than 0.5 before rounding, it could be rounded to 0.5 hours so that it is not zero. |
 | **Energy Source & Energy Conversion Technology 1 - Registered Capacity (MW)** | This is the Registered Capacity of the "Energy Source 1" expressed in MW. |
@@ -120,14 +120,14 @@
 | **Energy Source & Energy Conversion Technology 3 - Registered Capacity (MW)** | This is the Registered Capacity of the "Energy Source 3" expressed in MW. |
 | **Flexible Connection (Yes/No)**        | Indicates whether the connection is subject to a flexible connection arrangement e.g. Active Network Management (ANM) during system normal conditions. |
 | **Connection Status**                  | “Connected" or "Accepted to Connect"? |
-| **Already Connected**                  |                 |
+| `Already Connected`                  |                 |
 | **Already connected Registered Capacity (MW)** | This is the total Registered Capacity of generation already connected at the site expressed in MW. |
 | **Maximum Export Capacity (MW)**       | This is the total MW export capacity permitted as per the connection agreement. |
 | **Maximum Export Capacity (MVA)**      | This is the total MVA export capacity permitted as per the connection agreement. |
 | **Maximum Import Capacity (MW)**       | This is the total MW import capacity permitted as per the connection agreement. |
 | **Maximum Import Capacity (MVA)**      | This is the total MVA import capacity permitted as per the connection agreement. |
 | **Date Connected**                     | Date the connection was provided in the case of a new connection. In cases where there was an existing connection, this is the date the new equipment was connected. |
-| **Accepted to Connect**                |                 |
+| `Accepted to Connect`                |                       |
 | **Accepted to Connect Registered Capacity (MW)** | This is the Registered Capacity of generation that is not already connected but has been Accepted to Connect, expressed in MW. |
 | **Change to Maximum Export Capacity (MW)** | This is the new/additional MW export capacity (i.e., not yet connected) that has been accepted to connect as per the connection agreement. |
 | **Change to Maximum Export Capacity (MVA)** | This is the new/additional MVA export capacity (i.e., not yet connected) that has been accepted to connect as per the connection agreement. |
@@ -135,7 +135,7 @@
 | **Change to Maximum Import Capacity (MVA)** | This is the new/additional MVA import capacity (i.e., not yet connected) that has been accepted to connect as per the connection agreement. |
 | **Date Accepted**                      | Date the Customer accepted the connection offer from the DNO or IDNO. |
 | **Target Energisation Date**           | Estimated date of energisation. This date is likely to change to reflect the latest date notified by customers. |
-| **Services Provided**                  |                 |
+| `Services Provided`                  |                 |
 | **Distribution Service Provider (Y/N)** | Indicates whether a service is provided to the DNO. |
 | **Transmission Service Provider (Y/N)** | Indicates whether a service is provided to the ESO or a TO. |
 | **Reference**                          | Unique reference to the service(s) being provided. |
