@@ -1,4 +1,4 @@
-# Data Fields
+# Customer/Site Location Info
 
 1. Export MPAN / MSID
 2. Import MPAN / MSID
@@ -42,7 +42,7 @@
 34. Storage Duration 3 (Hours)
 35. Energy Source & Energy Conversion Technology 3 - Registered Capacity (MW)
 
-## Connection Details
+## Connection and Capacity Details
 36. Flexible Connection (Yes/No)
 37. Connection Status
 38. Already connected Registered Capacity (MW)
