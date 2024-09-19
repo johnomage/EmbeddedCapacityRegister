@@ -1,0 +1,9 @@
+# list of packages used
+# python 3.12.6 64bit
+pandas==2.2.2
+numpy==1.26.4
+matplotlib==3.9.2
+streamlit==1.38.0
+plotly==5.24.0
+geopandas==1.0.1
+dotenv==1.0.1
