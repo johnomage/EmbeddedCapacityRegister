@@ -1,7 +1,7 @@
 
 import geopandas as gpd
 import plotly.express as px
-
+import pandas as pd
 
 class Plotter:
     """
@@ -206,8 +206,8 @@ class Plotter:
 
         # Update layout with title, width, and height
         fig.update_layout(title='Capacity Distribution by Licence Area, Bulk Supply Point, Primary, and FSP Count',
-                        width=1000,
-                        height=1000)
+                        width=750,
+                        height=750)
 
         # Show the plot
         return fig
@@ -226,15 +226,37 @@ class Plotter:
             folium.Map: An interactive map object displaying the selected features
             from the GeoDataFrame, with color coding based on Licence Area.
         """
-        import folium
-        selected_features = ['Export MPAN_MSID', 'Town_City', 'Primary', 'Bulk Supply Point', 'Grid Supply Point', 'Licence Area', 'Eastings', 'Northings', 'geometry', 'Accepted to Connect Registered Capacity (MW)', 'Connection Status']
-        selected_dates = ['Date Connected', 'Last Updated', 'Date Accepted', 'Target Energisation Date']
+        
+        self.gdf = self.gdf.to_crs(epsg=4326)
 
-        bounds = self.gdf.total_bounds
+        self.gdf['Accepted to Connect Registered Capacity (MW)'].fillna(0, inplace=True)
+        self.gdf['Already connected Registered Capacity (MW)'].fillna(0, inplace=True)
 
-        layers = (self.gdf.drop(selected_dates, axis=1)[selected_features].explore(column='Licence Area',
-                                                                                   tiles="CartoDB dark_matter",
-                                                                                   vmin=bounds[1], vmax=bounds[3],
-                                                                                   scheme='JenksCaspallForced'))
+        
+        fig = px.scatter_mapbox(data_frame=self.gdf,
+                                lat=self.gdf.geometry.y,
+                                lon=self.gdf.geometry.x,
+                                hover_name='Licence Area',
+                                hover_data={
+                                    'Town_City': True, 
+                                    'County': True,
+                                    'Accepted to Connect Registered Capacity (MW)': True, 
+                                    'Already connected Registered Capacity (MW)': True
+                                },
+                                color='Licence Area', 
+                                color_discrete_sequence=['#0000FF', '#FFF700', '#80ff80', '#FF0000'],  
+                                size='Accepted to Connect Registered Capacity (MW)',  
+                                size_max=100, 
+                                zoom=6,
+                                mapbox_style="carto-darkmatter", 
+                                title="MPAN Locations by Licence Area"
+        )
 
-        return layers
+        # Update layout to adjust the size, title, etc.
+        fig.update_layout(
+            margin={"r": 0, "t": 0, "l": 0, "b": 0},  # Adjust margins
+            height=500,
+            title={'y':0.95, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'}
+        )
+
+        return fig
