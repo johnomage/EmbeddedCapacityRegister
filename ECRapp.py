@@ -67,8 +67,11 @@ licence_area_silcer = create_sidebar('Select DNO', 'Licence Area', 'Select DNO')
 # Voltage Level Slicer
 voltage_slicer = create_sidebar('Select Voltage', 'PoC Voltage (KV)', 'Voltage (KV)')
 
+# Connection status licer 
+connect_status_slicer = create_sidebar('Select Connection Status', 'Connection Status', 'Connection Status')
 
-data = raw_data[(raw_data["Licence Area"].isin(licence_area_silcer) & raw_data["PoC Voltage (KV)"].isin(voltage_slicer))]
+# Sidebar Data Filter
+data = raw_data[(raw_data["Licence Area"].isin(licence_area_silcer) & raw_data["PoC Voltage (KV)"].isin(voltage_slicer) & raw_data['Connection Status'].isin(connect_status_slicer))]
 
 plotter = Plotter(data)
 
