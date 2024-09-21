@@ -13,8 +13,8 @@ from preprocessor import run_preprocessor
 
 # ++++++++++++++++++++++++++++++++++++++++++ Configure page and Properties +++++++++++++++++++++++++++++++++++++++++
 st.set_page_config(
-    page_title="📊ECR Dashboard",
-    page_icon="",
+    page_title="ECR Dashboard",
+    page_icon="image.png",
     layout="wide",
     initial_sidebar_state="collapsed",
     menu_items={
