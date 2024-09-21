@@ -130,10 +130,12 @@ st.markdown("\n")
 
 # ++++++++++++++++++++++++++++++++++++++++++ Sunburst Container +++++++++++++++++++++++++++++++++++++++++
 st.plotly_chart(plotter.plot_sunburst_LA_2_FSP(), use_container_width=True)
+st.markdown("\n\n")
 
 
 
-# ++++++++++++++++++++++++++++++++++++++++++ Energy Source 1 Charts +++++++++++++++++++++++++++++++++++++++++
+
+# ++++++++++++++++++++++++++++++++++++++++++ Energy Source Charts +++++++++++++++++++++++++++++++++++++++++
 
 
 def show_source_cap_plots(source: str, source_number: int):
@@ -144,7 +146,7 @@ def show_source_cap_plots(source: str, source_number: int):
     with source_containers[0]:
         st.plotly_chart(plotter.plotTreeMap_energy_source_by_conv_tech(source, f'Energy Conversion Technology {source_number}', f'Reg_Cap_Energy_Source_Conv_Tech_{source_number}'))
     with source_containers[1]:
-        st.plotly_chart(plotter.plotLine_accpeted_over_time_by_source(f'Energy Source {source_number}'))
+        st.plotly_chart(plotter.plotLineScatter_accpeted_over_time_by_source(f'Energy Source {source_number}', 'line'))
     st.write('\n')
 
 
@@ -153,6 +155,9 @@ show_source_cap_plots('Energy Source 2', 2)
 show_source_cap_plots('Energy Source 3', 3)
 
 "---"
+
+make_subheader("Accepted Connect Capacity for All Sources")
+st.plotly_chart(plotter.plotLineScatter_accpeted_over_time_by_source('', 'scatter'), use_container_width=True)
 
 
 

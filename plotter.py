@@ -2,6 +2,8 @@
 import geopandas as gpd
 import plotly.express as px
 import pandas as pd
+from dotenv import load_dotenv, find_dotenv
+import os, ast
 
 class Plotter:
     """
@@ -133,7 +135,7 @@ class Plotter:
         
 
 
-    def plotLine_accpeted_over_time_by_source(self, source: str):
+    def plotLineScatter_accpeted_over_time_by_source(self, source: str, plot: str):
         """
         Plots a line chart showing the total accepted and maximum export capacity over time 
         for a specified energy source. The data is aggregated by 'Target Energisation Date' 
@@ -145,72 +147,103 @@ class Plotter:
         Returns:
             fig (plotly.graph_objects.Figure): The line chart figure.
         """
-        fig = px.line(data_frame=self.gdf.groupby(['Target Energisation Date', source])[['Accepted to Connect Registered Capacity (MW)',
-                                                                                         'Maximum Export Capacity (MW)']].agg(
-                                                                                             {'Accepted to Connect Registered Capacity (MW)': 'sum',
-                                                                                              'Maximum Export Capacity (MW)': 'sum'}
-                                         ).reset_index(), 
-            x='Target Energisation Date', 
-            y=['Accepted to Connect Registered Capacity (MW)', 'Maximum Export Capacity (MW)'],
-            title=f'Total Accepted Capacity Over Time for {source}',
-            markers='line+circle',
-            color=source,
-            # labels={'Target Energisation Date': 'Date', 'Accepted to Connect Registered Capacity (MW)': 'Capacity (MW)'},
-            color_discrete_sequence=px.colors.carto.Agsunset
-        )
+        match plot:
+            case 'line':
+                fig = px.line(data_frame=self.gdf.groupby(['Target Energisation Date', source])[['Accepted to Connect Registered Capacity (MW)',
+                                                                                                'Maximum Export Capacity (MW)']].agg(
+                                                                                                    {'Accepted to Connect Registered Capacity (MW)': 'sum',
+                                                                                                    'Maximum Export Capacity (MW)': 'sum'}
+                                                ).reset_index(), 
+                    x='Target Energisation Date', 
+                    y=['Accepted to Connect Registered Capacity (MW)', 'Maximum Export Capacity (MW)'],
+                    title=f'Total Accepted Capacity Over Time for {source}',
+                    markers='line+circle',
+                    color=source,
+                    # labels={'Target Energisation Date': 'Date', 'Accepted to Connect Registered Capacity (MW)': 'Capacity (MW)'},
+                    color_discrete_sequence=px.colors.carto.Agsunset
+                )
+                return fig
+            
+            case 'scatter':
+                data_sorted = self.gdf.sort_values('Target Energisation Date')
+                # Ensure 'Accepted to Connect Registered Capacity (MW)' has no NaN values
+                data_sorted['Accepted to Connect Registered Capacity (MW)'] = data_sorted['Accepted to Connect Registered Capacity (MW)'].fillna(1)
 
-        return fig
+                # Filter out rows with missing 'Target Energisation Date'
+                data_sorted = data_sorted.dropna(subset=['Target Energisation Date'])
+
+                # Extract the year from 'Target Energisation Date' and cast it as a string for animation
+                data_sorted['Year'] = data_sorted['Target Energisation Date'].dt.year.astype(str)
+
+                # Create the scatter plot
+                fig = px.scatter(
+                    data_frame=data_sorted,
+                    x='Target Energisation Date',
+                    y='Accepted to Connect Registered Capacity (MW)',
+                    title='Accepted to Connect Registered Capacity for all Sources Over Time',
+                    labels={
+                        'Target Energisation Date': 'Date',
+                        'Accepted to Connect Registered Capacity (MW)': 'Capacity (MW)',
+                        'Licence Area': 'Licence Area'
+                    },
+                    color='Licence Area',  # Color points by Licence Area
+                    color_discrete_sequence=px.colors.qualitative.Plotly,  # Use a discrete color sequence
+                    size='Accepted to Connect Registered Capacity (MW)',  # Size points by capacity
+                    size_max=30,  # Set maximum marker size
+                    hover_data=['Energy Source 1', 'Energy Conversion Technology 1', 'Energy Source 2', 'Energy Conversion Technology 2',
+                                'Energy Source 3', 'Energy Conversion Technology 3', 'PoC Voltage (KV)'],
+                    # animation_frame='Year',y
+                )
+
+                # Customize the layout to reposition the animator inside the figure
+                fig.update_layout(
+                    xaxis_title='Target Energisation Date',
+                    yaxis_title='Accepted to Connect Registered Capacity (MW)',
+                    hovermode='closest',
+                    legend_title_text='Licence Area',
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1 ),
+                )
+                return fig
+            case _:
+                return f'plot must be one of ["line", "scatter"] but got {plot}'
      
     
     def plot_sunburst_LA_2_FSP(self):
-        """
-        Plots a sunburst chart representing the capacity distribution by Licence Area, 
-        Bulk Supply Point, Primary, and FSP (Final Supply Point) count. The chart displays
-        accepted and already connected capacities at each level in a hierarchical structure.
+        # Reshape the data for sunburst chart
+        load_dotenv(find_dotenv('.env'))
 
-        The data is grouped by 'Licence Area', 'Bulk Supply Point', and 'Primary', 
-        and the 'Export MPAN_MSID' is renamed to 'FSP Count'. The capacities are aggregated 
-        and displayed in a sunburst chart, with colors representing different Licence Areas.
+        blue_purple = ast.literal_eval(os.getenv('blue_purple'))
 
-        Returns:
-            fig (plotly.graph_objects.Figure): The sunburst chart figure.
-        """
-        grouped_data = self.gdf.groupby(['Licence Area', 'Bulk Supply Point', 'Primary']).agg({'Accepted to Connect Registered Capacity (MW)': 'sum',
-                                                                                                'Already connected Registered Capacity (MW)': 'sum',
-                                                                                                'Export MPAN_MSID': 'count'}).reset_index()
+        cols = ['Maximum Export Capacity (MW)', 'Maximum Import Capacity (MW)', 'Change to Maximum Export Capacity (MW)', 'Change to Maximum Import Capacity (MW)']
+        self.gdf[cols] = self.gdf[cols].apply(pd.to_numeric, errors='coerce')
+        dno_voltage_energy_group = self.gdf.groupby(['Licence Area', 'PoC Voltage (KV)'])[cols].sum().reset_index()
 
-        # Rename the column 'Export MPAN_MSID' to 'FSP Count'
-        grouped_data.rename(columns={'Export MPAN_MSID': 'FSP Count'}, inplace=True)
+        sunburst_data = pd.melt(dno_voltage_energy_group, 
+                                id_vars=['Licence Area', 'PoC Voltage (KV)'], 
+                                value_vars=['Maximum Export Capacity (MW)',
+                                            'Maximum Import Capacity (MW)',
+                                            'Change to Maximum Export Capacity (MW)',
+                                            'Change to Maximum Import Capacity (MW)'],
+                                var_name='Capacity Type', 
+                                value_name='Capacity (MW)',
+                                )
 
-        # Melt the dataframe to create a hierarchical structure
-        melted_data = pd.melt(grouped_data,
-                            id_vars=['Licence Area', 'Bulk Supply Point', 'Primary', 'FSP Count'],
-                            var_name='Capacity Type',
-                            value_name='Capacity (MW)')
-
-        # Create a new column for the total (used for sorting)
-        melted_data['Total'] = melted_data.groupby(['Licence Area', 'Bulk Supply Point', 'Primary'])['Capacity (MW)'].transform('sum')
-
-        # Sort the dataframe
-        melted_data = melted_data.sort_values(['Total', 'Licence Area', 'Bulk Supply Point', 'Primary', 'Capacity Type'],
-                                            ascending=[False, True, True, True, True])
-
-        # Create the sunburst chart with color based on 'Licence Area'
-        fig = px.sunburst(melted_data, 
-                        path=['Licence Area', 'Bulk Supply Point', 'Primary', 'Capacity Type'], 
+        # Create the sunburst chart
+        fig = px.sunburst(sunburst_data, 
+                        path=['Licence Area', 'PoC Voltage (KV)', 'Capacity Type'], 
                         values='Capacity (MW)',
-                        color='Licence Area',  # Color by 'Licence Area'
-                        hover_data={'Capacity (MW)': True, 'FSP Count': True},
-                        color_discrete_sequence=px.colors.qualitative.Bold  # Color palette for Licence Area
-                        )
+                        color='Licence Area',
+                        color_discrete_sequence=blue_purple,
+                        hover_data={'Capacity (MW)': ':.2f'},
+                        branchvalues='total',
+                        height=600)
 
-        # Update layout with title, width, and height
-        fig.update_layout(title='Capacity Distribution by Licence Area, Bulk Supply Point, Primary, and FSP Count',
-                        width=750,
-                        height=750)
+        fig.update_layout(title='Import Export Capacity Distribution by Licence Area and Voltage',
+                        margin=dict(t=30, l=0, r=0, b=0))
 
-        # Show the plot
         return fig
+
+
     
 
     def plotMap_of_MPANs(self):
