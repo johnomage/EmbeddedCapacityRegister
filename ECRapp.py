@@ -36,7 +36,7 @@ def load_data(filename='processed_ecr'):
 raw_data = load_data('processed_ecr')
 
 # set page title
-st.title(f":bulb: Live NGED Embedded Capacity Register Dashboard: 2023 - 2028 \n\tLast Updated: {raw_data['Last Updated'].max().strftime('%A, %d/%m/%Y')}")
+st.title(f":bulb: Live NGED Embedded Capacity Register Dashboard: 2023 - 2038 \n\tLast Updated: {raw_data['Last Updated'].max().strftime('%A, %d/%m/%Y')}")
 
 def make_subheader(subheader):
     st.markdown(
@@ -51,18 +51,19 @@ def make_subheader(subheader):
 
 # ++++++++++++++++++++++++++++++++++++++++++ Sidebar Filters +++++++++++++++++++++++++++++++++++++++++
 def create_sidebar(label, feature, placeholder):
-    df = raw_data[~raw_data[feature].isna()] 
+    df = raw_data[~raw_data[feature].isna()]
     return st.sidebar.multiselect(
-                                label=label,
+                                label=f'\n{label}',
                                 options=df[feature].unique(),
                                 default=df[feature].unique(),
                                 placeholder=placeholder)
 
-st.sidebar.header("Global Sliders")
+st.sidebar.header("Sidebar Filters")
 
 
 # Licence Area silcer
 licence_area_silcer = create_sidebar('Select DNO', 'Licence Area', 'Select DNO')
+st.markdown("")
 
 # Voltage Level Slicer
 voltage_slicer = create_sidebar('Select Voltage', 'PoC Voltage (KV)', 'Voltage (KV)')
@@ -72,6 +73,18 @@ connect_status_slicer = create_sidebar('Select Connection Status', 'Connection S
 
 # Sidebar Data Filter
 data = raw_data[(raw_data["Licence Area"].isin(licence_area_silcer) & raw_data["PoC Voltage (KV)"].isin(voltage_slicer) & raw_data['Connection Status'].isin(connect_status_slicer))]
+
+if data.empty:
+    st.markdown(
+        """
+        <div style="background-color:red; padding: 10px; border-radius: 5px;">
+            <strong style="color:white;">🧙‍♂️Tabula Rasa !!!</strong><br>
+            <span style="color:white;">Fill thy content from the sidebar. At least one of Licence Area, PoC Voltage, Connection Status empty.</span>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
+    st.stop()
 
 plotter = Plotter(data)
 
@@ -166,9 +179,6 @@ st.plotly_chart(plotter.plotLineScatter_accpeted_over_time_by_source('', 'scatte
 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Empty Data +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if data.empty:
-    st.warning(f"Tabula rasa ⚠️\nFill thy content from the sidebar 🧙‍♂️")
-    st.stop()
-else:
-    st.write(f'Register showing {data.shape[0]} records')
-    st.dataframe(data)
+
+st.write(f'Register showing {data.shape[0]} records')
+st.dataframe(data)
